@@ -2,7 +2,7 @@
 
 ## Instructions
 
-``` cd restApiTest ```
+``` cd rest-api-test ```
 
 ``` npm install ```
 
