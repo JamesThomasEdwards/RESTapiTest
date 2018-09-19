@@ -156,4 +156,3 @@ function isListKeepNest(errorList, len, start = 0, str = '') {
     }
 
 }
-module.exports = concatenateErrorMessages
