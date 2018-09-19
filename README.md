@@ -6,7 +6,11 @@
 
 ``` npm install ```
 
-#### To Run Test
+## Test -> Mocha
+
+There are two additional test included in the test.js file
+
+### To Run Test
 
 ``` npm run test ```
 
