@@ -47,29 +47,19 @@ function createNewErrorMap(errorMap, args, keys, len = 0, newMap = Immutable.Map
     if (args.includes(keys[start])) {
         // if the value is a Map run it in isMapKeepNest;
         if (Immutable.Map.isMap(errorMap.get(keys[start]))) {
-            newMap = newMap.set(keys[start],
-                isMapKeepNest(errorMap.get(keys[start])));
-        } else {
+            newMap = newMap.set(keys[start], isMapKeepNest(errorMap.get(keys[start])));
             // if the value is a List run it in isListKeepNest;
-            newMap = newMap.set(keys[start],
-                isListKeepNest(errorMap.get(keys[start])));
+        } else if (Immutable.List.isList(errorMap.get(keys[start]))) {
+            newMap = newMap.set(keys[start], isListKeepNest(errorMap.get(keys[start])));
         }
         // if value is a Map run isMapVal;
     } else if (Immutable.Map.isMap(errorMap.get(keys[start]))) {
-        newMap = newMap.set(keys[start],
-            removeDuplicates(isMapVal(errorMap.get(keys[start]))
-                .split('.')
-                .map(ele => ele.trim()))
-                .join('. ') + '.');
-    } else {
+        newMap = newMap.set(keys[start], removeDuplicates(isMapVal(errorMap.get(keys[start])).split('.').map(ele => ele.trim())).join('. ') + '.');
         // if value is a List run isListVal;
-        newMap = newMap.set(keys[start],
-            removeDuplicates(isListVal(errorMap.get(keys[start]))
-                .split('.')
-                .map(ele => ele.trim()))
-                .join('. ') + '.');
+    } else if (Immutable.List.isList(errorMap.get(keys[start]))) {
+        newMap = newMap.set(keys[start], removeDuplicates(isListVal(errorMap.get(keys[start])).split('.').map(ele => ele.trim())).join('. ') + '.');
     }
-
+    // 
     return createNewErrorMap(errorMap, args, keys, len, newMap, start + 1);
 }
 
@@ -92,9 +82,10 @@ function isMapVal(errorMap, keys, len, start = 0, str = '') {
     // if value is a Map, recursively iterate;
     if (Immutable.Map.isMap(errorMap.get(keys[start]))) {
         return isMapVal(errorMap.get(keys[start]));
-    } else {
-        // if value is a List, run isListVal and set it equal to str;
-        // then recursively iterate;
+    }
+    // if value is a List, run isListVal and set it equal to str;
+    // then recursively iterate;
+    if (Immutable.List.isList(errorMap.get(keys[start]))) {
         str += isListVal(errorMap.get(keys[start]));
         return isMapVal(errorMap, keys, len, start + 1, str);
     }
@@ -131,16 +122,14 @@ function isMapKeepNest(errorMap, keys, len, start = 0) {
     // output of isMapKeepNest;
     // keep iterating recursively;
     if (Immutable.Map.isMap(errorMap.get(keys[start]))) {
-        errorMap = errorMap.set(keys[start],
-            isMapKeepNest(errorMap.get(keys[start])));
+        errorMap = errorMap.set(keys[start], isMapKeepNest(errorMap.get(keys[start])));
         return isMapKeepNest(errorMap, keys, len, start + 1);
-    } else {
-        // if value is a List set errorMap at current key, with value as;
-        // output of isListKeepNest;
-        // keep iterating recursively;
-        errorMap = errorMap.set(keys[start],
-            isListKeepNest(errorMap.get(keys[start]))
-                .join(' '));
+    }
+    // if value is a List set errorMap at current key, with value as;
+    // output of isListKeepNest;
+    // keep iterating recursively;
+    if (Immutable.List.isList(errorMap.get(keys[start]))) {
+        errorMap = errorMap.set(keys[start], isListKeepNest(errorMap.get(keys[start])).join(' '));
         return isMapKeepNest(errorMap, keys, len, start + 1);
     }
 
@@ -162,8 +151,7 @@ function isListKeepNest(errorList, len, start = 0, str = '') {
         // if List element is a Map, set the output of isMapKeepNest;
         // to the start index of errorList;
         // recursively iterate;
-        errorList = errorList.set(start,
-            isMapKeepNest(errorList.get(start)));
+        errorList = errorList.set(start, isMapKeepNest(errorList.get(start)));
         return isListKeepNest(errorList, len, start + 1);
     }
 
