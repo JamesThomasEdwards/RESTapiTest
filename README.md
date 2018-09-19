@@ -1,4 +1,4 @@
-# RESTapiTest
+# rest-api-test
 
 ## Instructions
 
@@ -6,6 +6,6 @@
 
 ``` npm install ```
 
-# To Run Test
+#### To Run Test
 
 ``` npm run test ```
